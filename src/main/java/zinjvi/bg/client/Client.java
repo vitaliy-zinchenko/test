@@ -1,4 +1,4 @@
-package zinjvi.bg;
+package zinjvi.bg.client;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -14,16 +14,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Client {
 
     private Socket socket;
-    private PrintWriter printWriter;
     private BlockingQueue<String> messages;
+    private ObjectOutputStream objectOutputStream;
 
-    public Client() {
+    public Client() throws IOException {
         messages = new LinkedBlockingQueue<>();
     }
 
     public void connect() throws IOException {
         socket = new Socket("localhost", 1111);
-        printWriter = new PrintWriter(socket.getOutputStream(), true);
+        objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
         Thread messageSender = new Thread(){
             @Override
             public void run() {
@@ -63,10 +63,8 @@ public class Client {
     }
 
     public void send(String message) throws IOException {
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
         objectOutputStream.writeObject(message);
         objectOutputStream.flush();
-        objectOutputStream.close();
     }
 
 
