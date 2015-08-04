@@ -1,4 +1,4 @@
-package zinjvi.bg;
+package zinjvi.bg.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;

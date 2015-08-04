@@ -1,4 +1,4 @@
-package zinjvi.bg;
+package zinjvi.bg.server;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,28 +9,25 @@ import java.net.Socket;
 public class ClientHandler implements Runnable {
 
     private Socket clientSocket;
+    private ObjectInputStream objectInputStream;
 
-    public ClientHandler(Socket clientSocket) {
+    public ClientHandler(Socket clientSocket) throws IOException {
         this.clientSocket = clientSocket;
+        objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
     }
 
     @Override
     public void run() {
         try {
-//            try (
-//
-//            ) {
-                 handle(clientSocket.getInputStream(), clientSocket.getOutputStream());
-//            }
+             handle();
         } catch (IOException e) {
             System.err.println("ERROR. Couldn't handle client.");
             e.printStackTrace();
         }
     }
 
-    private void handle(InputStream in, OutputStream out) throws IOException {
+    private void handle() throws IOException {
         while (true) {
-            ObjectInputStream objectInputStream = new ObjectInputStream(in);
             String line = null;
             try {
                 line = (String) objectInputStream.readObject();
