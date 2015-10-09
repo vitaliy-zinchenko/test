@@ -1,15 +1,13 @@
-package astro;
+package jms;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = AstroApplication.class)
-@WebAppConfiguration
-public class AstroApplicationTests {
+@SpringApplicationConfiguration(classes = JmsApplication.class)
+public class JmsApplicationTests {
 
 	@Test
 	public void contextLoads() {

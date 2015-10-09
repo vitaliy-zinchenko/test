@@ -24,13 +24,19 @@ public class Listener {
             session = jmsSessionFactory.create(Session.AUTO_ACKNOWLEDGE);
             Destination queue = session.createQueue(QUEUE_NAME);
             MessageConsumer consumer = session.createConsumer(queue);
-            consumer.setMessageListener(new MessageListener() {
-                @Override
-                public void onMessage(Message message) {
-                    System.out.println(message);
-                }
-            });
+            consumer.setMessageListener(this::processMessage);
         } catch (JMSException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void processMessage(Message message) {
+        try {
+            TextMessage textMessage = (TextMessage) message;
+            System.out.println("processing message: " + textMessage.getText());
+            Thread.sleep(10000);
+            System.out.println("finished processing message: " + textMessage.getText());
+        } catch (JMSException | InterruptedException e) {
             e.printStackTrace();
         }
     }
