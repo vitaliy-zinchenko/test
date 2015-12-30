@@ -2,14 +2,62 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd">
 
     <context:property-placeholder location="another.properties" />
 
     <!-- this property value is defined in another.properties, which we install in this XML file
     -->
-    <bean class="jms.Bean" >
+    <bean class="jms.Bean" init-method="init">
+        <property name="connectionFactory" ref="jmsFactory"/>
+        <property name="jmsTemplate" ref="jmsTemplate"/>
     </bean>
 
+    <bean id="jmsFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://localhost:61616"/>
+    </bean>
+
+    <bean id="messageReceiver" class="jms.StringMessageReceiver"/>
+
+    <bean id="converter" class="org.springframework.jms.support.converter.MappingJackson2MessageConverter">
+        <property name="typeIdPropertyName" value="type"/>
+        <property name="typeIdMappings">
+            <map>
+                <entry key="user" value="jms.User"/>
+            </map>
+        </property>
+    </bean>
+
+    <!--<bean class="org.springframework.jms.listener.SimpleMessageListenerContainer">-->
+        <!--<property name="connectionFactory" ref="jmsFactory" />-->
+        <!--<property name="destinationName" value="qname" />-->
+        <!--<property name="concurrentConsumers" value="5" />-->
+        <!--&lt;!&ndash;<property name="messageConverter" ref="converter"/>&ndash;&gt;-->
+        <!--<property name="messageListener">-->
+            <!--<bean class="org.springframework.jms.listener.adapter.MessageListenerAdapter">-->
+                <!--<constructor-arg ref="messageReceiver"/>-->
+                <!--&lt;!&ndash;<property name="messageConverter" ref="converter"/>&ndash;&gt;-->
+            <!--</bean>-->
+        <!--</property>-->
+    <!--</bean>-->
+
+    <jms:annotation-driven/>
+
+    <bean id="myContainerFactory"
+          class="org.springframework.jms.config.DefaultJmsListenerContainerFactory">
+        <property name="connectionFactory" ref="jmsFactory"/>
+        <!--<property name="destinationResolver">-->
+            <!--<bean class="org.springframework.jms.support.destination.DynamicDestinationResolver"/>-->
+        <!--</property>-->
+        <!--<property name="concurrency" value="3-10"/>-->
+        <property name="messageConverter" ref="converter"/>
+    </bean>
+
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="jmsFactory"/>
+        <property name="messageConverter" ref="converter"/>
+        <property name="defaultDestinationName" value="TEST.FOO"/>
+    </bean>
 
 </beans>

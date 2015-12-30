@@ -4,6 +4,9 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import zinjvi.common.JmsSessionFactory;
 
 import javax.jms.*;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 /**
  * Created by Vitaliy on 9/27/2015.
@@ -22,10 +25,13 @@ public class Listener {
     public void start() {
         try {
             session = jmsSessionFactory.create(Session.AUTO_ACKNOWLEDGE);
-            Destination queue = session.createQueue(QUEUE_NAME);
+            Context context = new InitialContext();
+            Destination queue = (Queue)context.lookup("MyQueue");
             MessageConsumer consumer = session.createConsumer(queue);
             consumer.setMessageListener(this::processMessage);
         } catch (JMSException e) {
+            e.printStackTrace();
+        } catch (NamingException e) {
             e.printStackTrace();
         }
     }
